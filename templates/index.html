@@ -470,6 +470,16 @@
                 </div>
             `;
         }
+
+        // Global session listener initialization
+        if (supabaseClient) {
+            supabaseClient.auth.onAuthStateChange((event, session) => {
+                if (session) {
+                    console.log(`Persistent session detected (${event}). Forwarding user into sanctuary.`);
+                    navigateTo('app');
+                }
+            });
+        }
     </script>
 </body>
 </html>
