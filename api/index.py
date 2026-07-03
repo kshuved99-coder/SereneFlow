@@ -65,7 +65,7 @@ def chat_companion():
         if heart_rate or sleep_hours or stress_scale:
             vitals_context = f" (For your context only, their wearable metrics show: Heart Rate: {heart_rate} BPM, Sleep: {sleep_hours}h, Stress: {stress_scale}/10. Keep this in mind but don't be robotic about it.)"
 
-        # REWRITTEN: Shifted from a rigid habit coach to a comforting, deep-listening best friend.
+        # Shifted from a rigid habit coach to a comforting, deep-listening best friend.
         system_prompt = (
             "You are Elowen, the user's deeply supportive, validating, and empathetic companion "
             "Your primary role is to just listen, validate their feelings warmly, "
@@ -165,7 +165,7 @@ def sleep_analyser():
         )
         return jsonify({"analysis": completion.choices[0].message.content})
     except Exception as e:
-        return jsonify({"analysis": f"Sleep metrics analytics processing error: {str(e)}\"}), 500
+        return jsonify({"analysis": f"Sleep metrics analytics processing error: {str(e)}"}), 500
 
 if __name__ == '__main__':
     app.run(debug=True)
