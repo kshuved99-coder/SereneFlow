@@ -1,4 +1,5 @@
 import os
+import json
 from flask import Flask, render_template, request, jsonify
 from groq import Groq
 from dotenv import load_dotenv
@@ -51,12 +52,10 @@ def chat_companion():
         })
 
     try:
-        # Dynamically inject wearable vitals data into context if populated
         vitals_context = ""
         if heart_rate or sleep_hours or stress_scale:
             vitals_context = f" (For your context only, their wearable metrics show: Heart Rate: {heart_rate} BPM, Sleep: {sleep_hours}h, Stress: {stress_scale}/10. Keep this in mind but don't be robotic about it.)"
 
-        # REWRITTEN: Shifted from a rigid habit coach to a comforting, deep-listening best friend.
         system_prompt = (
             "You are Elowen, the user's deeply supportive, validating, and empathetic companion "
             "Your primary role is to just listen, validate their feelings warmly, "
@@ -66,19 +65,17 @@ def chat_companion():
             "Keep answers natural, comforting, conversational, and concise (under 3 sentences) so it feels like a real chat.don't keep conversations long too long ask them do you want to keep chatting."
         )
         
-        # Build the sequential completion messages including history context
         messages = [{"role": "system", "content": system_prompt}]
         for msg in history:
             messages.append({"role": msg.get("role"), "content": msg.get("content")})
         
-        # Guarantee the latest message is added if not yet captured in the array
         if not history or history[-1].get("content") != user_message:
             messages.append({"role": "user", "content": user_message})
         
         completion = client.chat.completions.create(
             model="llama-3.1-8b-instant",
             messages=messages,
-            temperature=0.8,  # Slightly increased temperature for more natural, creative friend-like responses
+            temperature=0.8,
             max_tokens=250
         )
         ai_reply = completion.choices[0].message.content
@@ -119,15 +116,15 @@ def stress_planner():
         )
         return jsonify({"plan": completion.choices[0].message.content})
     except Exception as e:
-        return jsonify({"plan": f"Could not construct tactical guide: {str(e)}"}), 500
+        return jsonify({"plan": f"Could not construct tactical guide: {str(e)}", "fixes":[]}), 500
 
 @app.route('/api/sleep-analysis', methods=['POST'])
 def sleep_analyser():
     """Mode 3: Advanced Sleep Pattern Analytics Architecture"""
     data = request.json or {}
     hours = data.get("hours", 7)
-    quality = data.get("quality", 70)  # Sleep Quality Percentage
-    consistency = data.get("consistency", "variable") # Stable, Variable, Chaotic
+    quality = data.get("quality", 70)
+    consistency = data.get("consistency", "variable")
 
     client = get_groq_client()
     if not client:
@@ -156,6 +153,51 @@ def sleep_analyser():
         return jsonify({"analysis": completion.choices[0].message.content})
     except Exception as e:
         return jsonify({"analysis": f"Sleep metrics analytics processing error: {str(e)}"}), 500
+
+@app.route('/api/health-analysis', methods=['POST'])
+def health_analytics_tracker():
+    """Mode 4: Vitals Explorer & Interactive Health Blueprinting"""
+    data = request.json or {}
+    heart_rate = data.get("heart_rate", "Unknown")
+    sleep_hours = data.get("sleep_hours", "Unknown")
+    other_info = data.get("other_info", "None provided")
+
+    client = get_groq_client()
+    if not client:
+        return jsonify({
+            "observation": "Groq configuration token is missing. Falling back to internal engine emulation.",
+            "fixes": ["Verify GROQ_API_KEY settings", "Check local system environment links"]
+        })
+
+    prompt = (
+        f"The user has submitted the following active health metrics:\n"
+        f"- Heart Rate: {heart_rate} BPM\n"
+        f"- Sleep Hours: {sleep_hours} Hours\n"
+        f"- Additional Context/Symptom Notes: {other_info}\n\n"
+        f"Provide a brief, non-clinical overview (maximum 3 sentences) summarizing a sample of what could have happened "
+        f"conceptually from a daily lifestyle, fatigue, or stress perspective (e.g. elevated heart rate linked to minimal recovery time). "
+        f"Following that, provide exactly two practical, actionable methods/fixes they can use to re-balance their metrics.\n"
+        f"CRITICAL: You must output your response STRICTLY as a valid JSON object with keys: 'observation' (string) and 'fixes' (array containing exactly 2 items). "
+        f"Do not formulate diagnostic medical conclusions or outline official clinical plans."
+    )
+
+    try:
+        completion = client.chat.completions.create(
+            model="llama-3.1-8b-instant",
+            messages=[
+                {"role": "system", "content": "You are a wellness telemetry parsing agent. You return purely minified JSON matching requests."},
+                {"role": "user", "content": prompt}
+            ],
+            temperature=0.4,
+            response_format={"type": "json_object"}
+        )
+        parsed_response = json.loads(completion.choices[0].message.content)
+        return jsonify(parsed_response)
+    except Exception as e:
+        return jsonify({
+            "observation": f"A sample scenario indicates typical systemic fatigue from metric gaps. (Telemetry parsing fallback active).",
+            "fixes": ["Prioritize immediate hydration and mindful breathing blocks", "Establish a strict 30-minute electronic wind-down period"]
+        })
 
 if __name__ == '__main__':
     app.run(debug=True)

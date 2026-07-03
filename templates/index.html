@@ -177,10 +177,10 @@
 
         <section id="appView" class="w-full max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch hidden transition-all duration-500">
             <div class="lg:col-span-4 flex flex-col space-y-6">
-                <div class="bg-stone-100 dark:bg-[#0e1b12] rounded-3xl border border-stone-200/80 dark:border-emerald-950/60 shadow-xl p-6 relative overflow-hidden flex-grow flex flex-col justify-between">
+                <div class="bg-stone-100 dark:bg-[#0e1b12] rounded-3xl border border-stone-200/80 dark:border-emerald-950/60 shadow-xl p-6 relative overflow-hidden flex flex-col justify-between space-y-4">
                     <div class="absolute right-0 top-0 w-32 h-32 bg-teal-500/5 dark:bg-teal-400/5 rounded-bl-full pointer-events-none"></div>
                     
-                    <div class="space-y-6">
+                    <div class="space-y-4">
                         <div class="flex items-center space-x-4">
                             <div class="relative">
                                 <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-700 to-teal-500 dark:from-emerald-800 dark:to-teal-600 flex items-center justify-center shadow-md">
@@ -215,7 +215,7 @@
                         </div>
                     </div>
 
-                    <div class="pt-6 space-y-3">
+                    <div class="space-y-3">
                         <label class="text-[10px] font-bold tracking-widest uppercase text-stone-400 dark:text-emerald-50 block">Sanctuary Audio Environment</label>
                         <div class="flex items-center space-x-2">
                             <select id="audioVibeSelect" onchange="handleAudioChange()" class="flex-grow h-11 px-3 text-xs rounded-xl bg-stone-200/80 dark:bg-emerald-950/50 border border-stone-300/50 dark:border-emerald-900/40 focus:outline-none text-stone-700 dark:text-emerald-200">
@@ -227,6 +227,44 @@
                                 Play
                             </button>
                         </div>
+                    </div>
+                </div>
+
+                <div class="bg-stone-100 dark:bg-[#0e1b12] rounded-3xl border border-stone-200/80 dark:border-emerald-950/60 shadow-xl p-6 space-y-4">
+                    <h4 class="text-xs font-bold uppercase tracking-widest text-stone-400 dark:text-emerald-50">Wearable Health Vitals Tracker</h4>
+                    <div class="grid grid-cols-2 gap-3 text-xs">
+                        <div>
+                            <label class="block text-stone-500 dark:text-emerald-400/60 mb-1">Heart Rate (BPM)</label>
+                            <input type="number" id="vitalsHeartRate" placeholder="72" class="w-full h-9 px-3 rounded-xl bg-white dark:bg-emerald-950/20 border border-stone-300 dark:border-emerald-900/40 text-stone-800 dark:text-emerald-100 focus:outline-none focus:border-emerald-600">
+                        </div>
+                        <div>
+                            <label class="block text-stone-500 dark:text-emerald-400/60 mb-1">Sleep Hours</label>
+                            <input type="number" id="vitalsSleepHours" placeholder="7.5" step="0.1" class="w-full h-9 px-3 rounded-xl bg-white dark:bg-emerald-950/20 border border-stone-300 dark:border-emerald-900/40 text-stone-800 dark:text-emerald-100 focus:outline-none focus:border-emerald-600">
+                        </div>
+                        <div>
+                            <label class="block text-stone-500 dark:text-emerald-400/60 mb-1">Stress (1-10)</label>
+                            <input type="number" id="vitalsStressScale" placeholder="4" min="1" max="10" class="w-full h-9 px-3 rounded-xl bg-white dark:bg-emerald-950/20 border border-stone-300 dark:border-emerald-900/40 text-stone-800 dark:text-emerald-100 focus:outline-none focus:border-emerald-600">
+                        </div>
+                        <div>
+                            <label class="block text-stone-500 dark:text-emerald-400/60 mb-1">Sleep Quality (%)</label>
+                            <input type="number" id="vitalsSleepQuality" placeholder="80" min="1" max="100" class="w-full h-9 px-3 rounded-xl bg-white dark:bg-emerald-950/20 border border-stone-300 dark:border-emerald-900/40 text-stone-800 dark:text-emerald-100 focus:outline-none focus:border-emerald-600">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs text-stone-500 dark:text-emerald-400/60 mb-1">Circadian Schedule Consistency</label>
+                        <select id="vitalsConsistency" class="w-full h-9 px-3 text-xs rounded-xl bg-white dark:bg-emerald-950/20 border border-stone-300 dark:border-emerald-900/40 text-stone-800 dark:text-emerald-100 focus:outline-none focus:border-emerald-600">
+                            <option value="stable">Stable Profile</option>
+                            <option value="variable" selected>Variable Shift</option>
+                            <option value="chaotic">Chaotic Flow</option>
+                        </select>
+                    </div>
+                    <div class="flex gap-2 pt-2">
+                        <button onclick="requestStressPlan()" class="flex-1 h-10 bg-teal-800 hover:bg-teal-700 text-white rounded-xl text-xs font-medium transition-all shadow-md">
+                            Stress Plan
+                        </button>
+                        <button onclick="requestSleepAnalysis()" class="flex-1 h-10 bg-emerald-800 hover:bg-emerald-700 text-white rounded-xl text-xs font-medium transition-all shadow-md">
+                            Sleep Analysis
+                        </button>
                     </div>
                 </div>
             </div>
@@ -276,6 +314,23 @@
 
     </main>
 
+    <div id="analyticsModal" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-stone-950/80 backdrop-blur-sm hidden">
+        <div class="bg-stone-100 dark:bg-[#0e1b12] w-full max-w-lg rounded-3xl border border-stone-200/80 dark:border-emerald-950/60 p-6 shadow-2xl relative flex flex-col justify-between space-y-4 max-h-[85vh]">
+            <div class="flex justify-between items-center border-b border-stone-200 dark:border-emerald-950/60 pb-3">
+                <h3 id="modalTitle" class="text-lg font-serif font-bold text-stone-800 dark:text-emerald-100">Sanctuary Evaluation</h3>
+                <button onclick="closeModal()" class="text-stone-400 hover:text-stone-600 dark:hover:text-emerald-300 text-xl font-bold focus:outline-none">&times;</button>
+            </div>
+            <div id="modalContent" class="text-sm text-stone-600 dark:text-emerald-200/80 leading-relaxed whitespace-pre-wrap overflow-y-auto pr-2 font-light">
+                Processing analytics context vectors...
+            </div>
+            <div class="flex justify-end pt-2">
+                <button onclick="closeModal()" class="px-5 h-10 text-xs bg-emerald-800 hover:bg-emerald-700 text-white rounded-xl font-medium transition-all shadow-md">
+                    Return to Sanctuary
+                </button>
+            </div>
+        </div>
+    </div>
+
     <footer class="py-6 text-center text-xs text-stone-400/70 dark:text-emerald-500/40 border-t border-stone-200/5 dark:border-emerald-950/20 max-w-7xl w-full mx-auto px-4">
         <div>&copy; 2026 SereneFlow Sanctuary. All original state, handlers, and backend logic preserved perfectly.</div>
     </footer>
@@ -284,6 +339,9 @@
         let activeTheme = 'dark';
         let activeView = 'landing';
         let activeAuthMode = 'login';
+
+        // Global Stateful Chat Conversation Array Memory Manager
+        let chatHistory = [];
 
         const SUPABASE_URL = "{{ supabase_url }}";
         const SUPABASE_ANON_KEY = "{{ supabase_anon_key }}";
@@ -473,7 +531,7 @@
             }
         }
 
-        // Fixed Dynamic Chat Submission Framework
+        // Mode 1: Dynamic Chat Submission Framework with Vitals Context Injection
         async function handleSendMessage(event) {
             event.preventDefault();
             const inputField = document.getElementById('userInputField');
@@ -505,19 +563,30 @@
             chatWindow.insertAdjacentHTML('beforeend', typingPlaceholderHtml);
             chatWindow.scrollTop = chatWindow.scrollHeight;
 
+            // Extract Tracking Inputs dynamically from the metrics dashboard component
+            const hr = document.getElementById('vitalsHeartRate').value;
+            const sleep = document.getElementById('vitalsSleepHours').value;
+            const stress = document.getElementById('vitalsStressScale').value;
+
             let companionResponseText = "";
 
             try {
-                // Post directly to your production Python Flask API backend
+                // Post directly to production Python Flask API backend passing active chatHistory elements
                 const response = await fetch('/api/chat', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message: messageText, history: [] })
+                    body: JSON.stringify({ 
+                        message: messageText, 
+                        history: chatHistory,
+                        heart_rate: hr,
+                        sleep_hours: sleep,
+                        stress_scale: stress
+                    })
                 });
 
                 if (response.ok) {
                     const data = await response.json();
-                    companionResponseText = data.reply || data.response || data.analysis;
+                    companionResponseText = data.reply;
                 }
             } catch (error) {
                 console.warn("Backend pipeline bypassed or missing API keys. Activating internal best-friend listener.");
@@ -533,6 +602,10 @@
                 ];
                 companionResponseText = bestFriendEmulations[Math.floor(Math.random() * bestFriendEmulations.length)];
             }
+
+            // Append conversational state context elements to structural memory
+            chatHistory.push({ role: "user", content: messageText });
+            chatHistory.push({ role: "assistant", content: companionResponseText });
 
             // Remove the placeholder bubble and render the dynamic response safely
             const placeholderNode = document.getElementById(placeholderId);
@@ -550,7 +623,77 @@
             chatWindow.scrollTop = chatWindow.scrollHeight;
         }
 
+        // Mode 2 Architectural Pipeline Invocation Wrapper
+        async function requestStressPlan() {
+            const stress = document.getElementById('vitalsStressScale').value || 5;
+            const sleep = document.getElementById('vitalsSleepHours').value || 7;
+            const hr = document.getElementById('vitalsHeartRate').value || "";
+
+            openModal("Generating Tactical Cooldown Guide", "Formulating grounding sequences based on user context matrix...");
+
+            try {
+                const response = await fetch('/api/stress-plan', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        stress_scale: parseInt(stress),
+                        sleep_hours: parseFloat(sleep),
+                        heart_rate: hr
+                    })
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    openModal("Immediate Cooldown Plan", data.plan);
+                } else {
+                    openModal("System Link Error", "The stress-plan optimization module returned an invalid network state code.");
+                }
+            } catch (error) {
+                openModal("Integration Fallback Execution", "### Grounding Guide\n1. Move your vision to 3 things you can see right now.\n2. Inhale cleanly for 4 seconds, retain, release slowly.\n3. Consume an ambient fluid cleanly.\n\n*Verify active Flask endpoints to remove mock behavior.*");
+            }
+        }
+
+        // Mode 3 Architectural Pipeline Invocation Wrapper
+        async function requestSleepAnalysis() {
+            const sleep = document.getElementById('vitalsSleepHours').value || 7;
+            const quality = document.getElementById('vitalsSleepQuality').value || 70;
+            const consistency = document.getElementById('vitalsConsistency').value;
+
+            openModal("Evaluating Circadian Clock Architecture", "Parsing user metrics profile graphs...");
+
+            try {
+                const response = await fetch('/api/sleep-analysis', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        hours: parseFloat(sleep),
+                        quality: parseInt(quality),
+                        consistency: consistency
+                    })
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    openModal("Sleep Pattern Analytics", data.analysis);
+                } else {
+                    openModal("System Link Error", "The sleep pattern analytics matrix structure threw processing anomalies.");
+                }
+            } catch (error) {
+                openModal("Integration Fallback Execution", "Your circadian bedding schedule shows partial alignment shifts. Daytime stress mitigation routines are suggested to counteract restorative phase latency.");
+            }
+        }
+
+        // Analytics Insight Overlay Modal Display Layer Controls
+        function openModal(title, content) {
+            document.getElementById('modalTitle').innerText = title;
+            document.getElementById('modalContent').innerText = content;
+            document.getElementById('analyticsModal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('analyticsModal').classList.add('hidden');
+        }
+
         function clearChatLog() {
+            chatHistory = []; // Reset the global history state matrix 
             const chatWindow = document.getElementById('chatMessageWindow');
             chatWindow.innerHTML = `
                 <div class="flex items-start space-x-3 max-w-[85%]">
