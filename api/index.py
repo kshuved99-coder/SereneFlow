@@ -21,18 +21,9 @@ def get_groq_client():
 
 @app.route('/')
 def home():
-    """Serves the primary user interface workspace dashboard with injected configurations."""
+    """Serves the primary unified sanctuary application interface workspace."""
     return render_template(
         'index.html',
-        supabase_url=os.environ.get("SUPABASE_URL", ""),
-        supabase_anon_key=os.environ.get("SUPABASE_ANON_KEY", "")
-    )
-
-@app.route('/vitals')
-def vitals_page():
-    """NEW ROUTE: Serves the separate standalone health parameter entry interface."""
-    return render_template(
-        'vitals.html',
         supabase_url=os.environ.get("SUPABASE_URL", ""),
         supabase_anon_key=os.environ.get("SUPABASE_ANON_KEY", "")
     )
@@ -42,7 +33,7 @@ def chat_companion():
     """Mode 1: Best Friend & Deep Listening Companion (Supports History & Vitals)"""
     data = request.json or {}
     user_message = data.get("message", "").strip()
-    history = data.get("history", [])  # Holds conversation history for follow-up capability
+    history = data.get("history", [])
     heart_rate = data.get("heart_rate", "")
     sleep_hours = data.get("sleep_hours", "")
     stress_scale = data.get("stress_scale", "")
@@ -60,12 +51,10 @@ def chat_companion():
         })
 
     try:
-        # Dynamically inject wearable vitals data into context if populated
         vitals_context = ""
         if heart_rate or sleep_hours or stress_scale:
             vitals_context = f" (For your context only, their wearable metrics show: Heart Rate: {heart_rate} BPM, Sleep: {sleep_hours}h, Stress: {stress_scale}/10. Keep this in mind but don't be robotic about it.)"
 
-        # Shifted from a rigid habit coach to a comforting, deep-listening best friend.
         system_prompt = (
             "You are Elowen, the user's deeply supportive, validating, and empathetic companion "
             "Your primary role is to just listen, validate their feelings warmly, "
@@ -76,19 +65,17 @@ def chat_companion():
             "Keep answers natural, comforting, conversational, and concise (under 3 sentences) so it feels like a real chat.don't keep conversations long too long ask them do you want to keep chatting."
         )
         
-        # Build the sequential completion messages including history context
         messages = [{"role": "system", "content": system_prompt}]
         for msg in history:
             messages.append({"role": msg.get("role"), "content": msg.get("content")})
         
-        # Guarantee the latest message is added if not yet captured in the array
         if not history or history[-1].get("content") != user_message:
             messages.append({"role": "user", "content": user_message})
         
         completion = client.chat.completions.create(
             model="llama-3.1-8b-instant",
             messages=messages,
-            temperature=0.8,  # Slightly increased temperature for more natural, creative friend-like responses
+            temperature=0.8,
             max_tokens=250
         )
         ai_reply = completion.choices[0].message.content
@@ -136,8 +123,8 @@ def sleep_analyser():
     """Mode 3: Advanced Sleep Pattern Analytics Architecture"""
     data = request.json or {}
     hours = data.get("hours", 7)
-    quality = data.get("quality", 70)  # Sleep Quality Percentage
-    consistency = data.get("consistency", "variable") # Stable, Variable, Chaotic
+    quality = data.get("quality", 70)
+    consistency = data.get("consistency", "variable")
 
     client = get_groq_client()
     if not client:

@@ -50,13 +50,13 @@
                     <svg id="moonIcon" class="w-5 h-5 block dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
                 </button>
 
-                <a href="/vitals" class="flex items-center space-x-2 px-4 h-11 text-sm font-medium rounded-xl bg-stone-200/60 dark:bg-emerald-950/40 text-stone-700 dark:text-emerald-300 hover:scale-105 transition-all duration-200 border border-stone-300/30 dark:border-emerald-800/20" title="Open Visor Analytics">
+                <button onclick="toggleVisorPanel()" class="flex items-center space-x-2 px-4 h-11 text-sm font-medium rounded-xl bg-stone-200/60 dark:bg-emerald-950/40 text-stone-700 dark:text-emerald-300 hover:scale-105 transition-all duration-200 border border-stone-300/30 dark:border-emerald-800/20" title="Open Visor Biometrics">
                     <svg class="w-4 h-4 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
                     </svg>
                     <span>Visor</span>
-                </a>
+                </button>
                 
                 <button id="navCta" onclick="navigateTo('auth')" class="px-5 h-11 text-sm font-medium rounded-xl bg-emerald-800 hover:bg-emerald-700 text-white dark:bg-emerald-700 dark:hover:bg-emerald-600 transition-all duration-200 shadow-md shadow-emerald-900/10">
                     Sign In
@@ -64,6 +64,66 @@
             </div>
         </div>
     </header>
+
+    <div id="visorPanelContainer" class="fixed inset-y-0 right-0 z-50 w-full max-w-sm bg-[#0e1b12] border-l border-emerald-950/80 shadow-2xl p-6 flex flex-col justify-between transform translate-x-full transition-transform duration-300 ease-in-out">
+        <div class="space-y-6">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-xl bg-teal-950/50 border border-teal-800/30 flex items-center justify-center text-teal-400">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 002 2h2a2 2 0 002-2"/></svg>
+                    </div>
+                    <div>
+                        <h3 class="text-md font-bold tracking-wide text-emerald-100">Wearable Health Vitals</h3>
+                        <p class="text-[10px] text-emerald-400/60 uppercase tracking-widest">Biometric Sync Matrix</p>
+                    </div>
+                </div>
+                <button onclick="toggleVisorPanel()" class="text-stone-400 hover:text-white text-sm p-1">✕</button>
+            </div>
+
+            <p class="text-xs text-emerald-200/60 leading-relaxed">
+                Tune live heart frequency dynamics and sleep attributes to adapt the response parameters generated inside the sanctuary.
+            </p>
+
+            <div class="space-y-4 pt-2">
+                <div>
+                    <div class="flex justify-between text-xs mb-1">
+                        <span class="text-emerald-400/70 font-medium">Heart Rate (BPM)</span>
+                        <span id="hrVal" class="text-emerald-300 font-bold">72</span>
+                    </div>
+                    <input type="range" id="hrInput" min="50" max="140" value="72" oninput="updateVitalMetric('hr', this.value)" class="w-full accent-emerald-500 h-1.5 bg-emerald-950 rounded-lg appearance-none cursor-pointer">
+                </div>
+
+                <div>
+                    <div class="flex justify-between text-xs mb-1">
+                        <span class="text-emerald-400/70 font-medium">Sleep Duration (Hours)</span>
+                        <span id="sleepVal" class="text-emerald-300 font-bold">7.5</span>
+                    </div>
+                    <input type="range" id="sleepInput" min="3" max="12" step="0.5" value="7.5" oninput="updateVitalMetric('sleep', this.value)" class="w-full accent-emerald-500 h-1.5 bg-emerald-950 rounded-lg appearance-none cursor-pointer">
+                </div>
+
+                <div>
+                    <div class="flex justify-between text-xs mb-1">
+                        <span class="text-emerald-400/70 font-medium">Perceived Stress Scale</span>
+                        <span id="stressVal" class="text-emerald-300 font-bold">4</span>
+                    </div>
+                    <input type="range" id="stressInput" min="1" max="10" value="4" oninput="updateVitalMetric('stress', this.value)" class="w-full accent-emerald-500 h-1.5 bg-emerald-950 rounded-lg appearance-none cursor-pointer">
+                </div>
+            </div>
+
+            <div class="pt-2 flex space-x-2">
+                <button type="button" onclick="calculateStressPlan()" class="flex-1 h-9 rounded-xl bg-emerald-900/40 hover:bg-emerald-900/60 text-emerald-300 font-medium text-xs border border-emerald-800/30 transition-all">
+                    Stress Plan
+                </button>
+                <button type="button" onclick="calculateSleepAnalysis()" class="flex-1 h-9 rounded-xl bg-teal-900/40 hover:bg-teal-900/60 text-teal-300 font-medium text-xs border border-teal-800/30 transition-all">
+                    Sleep Analysis
+                </button>
+            </div>
+
+            <div id="analyticsOutputArea" class="hidden p-3 rounded-xl bg-emerald-950/20 border border-emerald-900/30 text-[11px] text-emerald-200/80 leading-relaxed max-h-[140px] overflow-y-auto"></div>
+        </div>
+
+        <div class="text-[10px] text-emerald-500/30 text-center pt-4">Secure Sub-Layer Active</div>
+    </div>
 
     <main class="flex-grow flex items-center justify-center py-8 px-4 sm:px-6 lg:px-8 relative w-full">
         
@@ -183,98 +243,52 @@
             </form>
         </section>
 
-        <section id="appView" class="w-full max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch hidden transition-all duration-500">
-            <div class="lg:col-span-4 flex flex-col space-y-6">
-                <div class="bg-stone-100 dark:bg-[#0e1b12] rounded-3xl border border-stone-200/80 dark:border-emerald-950/60 shadow-xl p-6 relative overflow-hidden flex-grow flex flex-col justify-between">
-                    <div class="absolute right-0 top-0 w-32 h-32 bg-teal-500/5 dark:bg-teal-400/5 rounded-bl-full pointer-events-none"></div>
-                    
-                    <div class="space-y-6">
-                        <div class="flex items-center space-x-4">
-                            <div class="relative">
-                                <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-700 to-teal-500 dark:from-emerald-800 dark:to-teal-600 flex items-center justify-center shadow-md">
-                                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                                </div>
-                                <span class="absolute bottom-0 right-0 w-4 h-4 rounded-full bg-emerald-500 border-2 border-stone-100 dark:border-[#0e1b12]"></span>
-                            </div>
-                            <div>
-                                <h3 class="text-xl font-serif font-bold text-stone-800 dark:text-emerald-100">Elowen</h3>
-                                <p class="text-xs text-emerald-700 dark:text-emerald-400 font-medium tracking-wide uppercase">Cottage Guide Companion</p>
-                            </div>
-                        </div>
-
-                        <div class="space-y-2 text-sm leading-relaxed text-stone-600 dark:text-emerald-200/70">
-                            <p>Elowen is trained in mindfulness, ambient soundscapes, and tranquil conversational therapeutic support.</p>
-                            <blockquote class="border-l-2 border-teal-500/40 pl-3 italic text-stone-500 dark:text-emerald-400/50 text-xs">
-                                "The river always finds its way around the stone..."
-                            </blockquote>
-                        </div>
-
-                        <hr class="border-stone-200 dark:border-emerald-950/60">
-
-                        <div class="grid grid-cols-2 gap-4">
-                            <div class="p-3 rounded-xl bg-stone-200/50 dark:bg-emerald-950/30 border border-stone-300/20 dark:border-emerald-900/20">
-                                <span class="block text-[10px] uppercase tracking-wider text-stone-500 dark:text-emerald-400/50">Current Vibe</span>
-                                <span class="text-sm font-semibold text-stone-700 dark:text-emerald-200">Melodies</span>
-                            </div>
-                            <div class="p-3 rounded-xl bg-stone-200/50 dark:bg-emerald-950/30 border border-stone-300/20 dark:border-emerald-900/20">
-                                <span class="block text-[10px] uppercase tracking-wider text-stone-500 dark:text-emerald-400/50">Stillness</span>
-                                <span class="text-sm font-semibold text-stone-700 dark:text-emerald-200">88% Aligned</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="pt-6 space-y-3">
-                        <label class="text-[10px] font-bold tracking-widest uppercase text-stone-400 dark:text-emerald-50 block">Sanctuary Audio Environment</label>
-                        <div class="flex items-center space-x-2">
-                            <select id="audioVibeSelect" onchange="handleAudioChange()" class="flex-grow h-11 px-3 text-xs rounded-xl bg-stone-200/80 dark:bg-emerald-950/50 border border-stone-300/50 dark:border-emerald-900/40 focus:outline-none text-stone-700 dark:text-emerald-200">
-                                <option value="waterfall">Melodic Orange</option>
-                                <option value="rain">Window Beats</option>
-                                <option value="forest">Deep Dawn </option>
-                            </select>
-                            <button id="audioPlaybackToggleBtn" onclick="toggleAudioPlayback()" class="h-11 px-3 rounded-xl bg-emerald-800 text-white font-medium text-xs hover:bg-emerald-700 transition-all flex items-center justify-center min-w-[80px]">
-                                Play
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="lg:col-span-8 flex flex-col justify-between bg-stone-100 dark:bg-[#0e1b12] rounded-3xl border border-stone-200/80 dark:border-emerald-950/60 shadow-xl overflow-hidden min-h-[500px]">
+        <section id="appView" class="w-full max-w-4xl mx-auto hidden transition-all duration-500">
+            <div class="flex flex-col justify-between bg-stone-100 dark:bg-[#0e1b12] rounded-3xl border border-stone-200/80 dark:border-emerald-950/60 shadow-xl overflow-hidden min-h-[550px] w-full">
                 <div class="px-6 py-4 border-b border-stone-200/80 dark:border-emerald-950/60 bg-stone-50 dark:bg-[#0c1710] flex justify-between items-center">
-                    <div class="flex items-center space-x-2">
-                        <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-                        <span class="text-xs font-semibold uppercase tracking-wider text-stone-600 dark:text-emerald-300">Active Attunement Dialog</span>
+                    <div class="flex items-center space-x-3">
+                        <div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+                        <div>
+                            <span class="text-xs font-bold uppercase tracking-wider text-stone-700 dark:text-emerald-100">Elowen</span>
+                            <span class="text-[10px] text-emerald-500 block">Sanctuary Audio Active</span>
+                        </div>
                     </div>
-                    <button onclick="clearChatLog()" class="text-xs text-stone-400 hover:text-stone-600 dark:text-emerald-500 dark:hover:text-emerald-400 transition-colors">Clear History</button>
+                    <div class="flex items-center space-x-3">
+                        <select id="audioVibeSelect" onchange="handleAudioChange()" class="h-8 px-2 text-[11px] rounded-lg bg-stone-200/80 dark:bg-emerald-950/50 border border-stone-300/50 dark:border-emerald-900/40 text-stone-700 dark:text-emerald-200 focus:outline-none">
+                            <option value="waterfall">Melodic Orange</option>
+                            <option value="rain">Window Beats</option>
+                            <option value="forest">Deep Dawn</option>
+                        </select>
+                        <button id="audioPlaybackToggleBtn" onclick="toggleAudioPlayback()" class="h-8 px-3 rounded-lg bg-emerald-800 text-white font-medium text-xs hover:bg-emerald-700 transition-all">
+                            Play Audio
+                        </button>
+                        <button onclick="clearChatLog()" class="text-xs text-stone-400 hover:text-stone-600 dark:text-emerald-500 dark:hover:text-emerald-400 transition-colors">Clear</button>
+                    </div>
                 </div>
 
-                <div id="chatMessageWindow" class="flex-grow p-6 space-y-4 overflow-y-auto max-h-[380px]">
+                <div id="chatMessageWindow" class="flex-grow p-6 space-y-4 overflow-y-auto max-h-[420px]">
                     <div class="flex items-start space-x-3 max-w-[85%]">
                         <div class="w-8 h-8 rounded-lg bg-emerald-800 text-white flex items-center justify-center text-xs shrink-0 font-serif">E</div>
                         <div class="bg-stone-200/60 dark:bg-emerald-950/30 border border-stone-300/20 dark:border-emerald-900/20 rounded-2xl rounded-tl-none p-3.5 text-sm text-stone-700 dark:text-emerald-100">
-                            Welcome back to the cabin. Take a deep breath. How are the currents of your mind flowing today?
+                            Welcome back to the cabin workspace. Take a deep breath. How are the currents of your mind flowing today?
                         </div>
                     </div>
                 </div>
 
                 <div class="px-6 pt-2">
-                    <div class="flex items-end justify-center h-8 w-full px-4 space-x-1 opacity-70 dark:opacity-50">
+                    <div class="flex items-end justify-center h-6 w-full px-4 space-x-1 opacity-40">
                         <div class="w-1 bg-stone-400 dark:bg-emerald-800 h-1/4 rounded-full"></div>
                         <div class="w-1 bg-emerald-600 dark:bg-emerald-700 h-1/2 rounded-full"></div>
-                        <div class="w-1 bg-emerald-500 dark:bg-emerald-600 h-3/4 rounded-full animate-bounce" style="animation-duration: 2.1s"></div>
-                        <div class="w-1 bg-teal-500 dark:bg-teal-500 h-2/3 rounded-full animate-bounce" style="animation-duration: 1.5s"></div>
-                        <div class="w-1 bg-emerald-600 dark:bg-emerald-600 h-full rounded-full animate-bounce" style="animation-duration: 1.8s"></div>
+                        <div class="w-1 bg-emerald-500 dark:bg-emerald-600 h-3/4 rounded-full animate-bounce"></div>
+                        <div class="w-1 bg-teal-500 dark:bg-teal-500 h-2/3 rounded-full animate-bounce"></div>
                         <div class="w-1 bg-stone-300 dark:bg-emerald-900 h-1/3 rounded-full"></div>
-                        <div class="w-1 bg-emerald-500 dark:bg-emerald-600 h-3/5 rounded-full animate-bounce" style="animation-duration: 2.4s"></div>
-                        <div class="w-1 bg-teal-400 dark:bg-teal-400 h-5/6 rounded-full animate-bounce" style="animation-duration: 1.3s"></div>
-                        <div class="w-1 bg-stone-400 dark:bg-emerald-800 h-1/4 rounded-full"></div>
                     </div>
                 </div>
 
                 <div class="p-4 bg-stone-50 dark:bg-[#0c1710] border-t border-stone-200/80 dark:border-emerald-950/60">
                     <form id="chatSubmissionForm" onsubmit="handleSendMessage(event)" class="flex items-center space-x-3">
                         <input type="text" id="userInputField" placeholder="Speak with Elowen or ask for a breathing flow..." required autocomplete="off" class="flex-grow h-12 px-4 rounded-xl bg-white dark:bg-emerald-950/20 border border-stone-300 dark:border-emerald-900/40 focus:outline-none focus:border-emerald-600 text-stone-800 dark:text-emerald-100 text-sm transition-all">
-                        <button type="submit" class="h-12 w-12 rounded-xl bg-emerald-800 hover:bg-emerald-700 dark:bg-emerald-700 dark:hover:bg-emerald-600 text-white flex items-center justify-center shadow-md shadow-emerald-900/10 transition-all duration-150">
+                        <button type="submit" class="h-12 w-12 rounded-xl bg-emerald-800 hover:bg-emerald-700 dark:bg-emerald-700 dark:hover:bg-emerald-600 text-white flex items-center justify-center shadow-md transition-all duration-150">
                             <svg class="w-5 h-5 transform rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9-2-9-18-9 18 9-2zm0 0v-8"/></svg>
                         </button>
                     </form>
@@ -285,13 +299,14 @@
     </main>
 
     <footer class="py-6 text-center text-xs text-stone-400/70 dark:text-emerald-500/40 border-t border-stone-200/5 dark:border-emerald-950/20 max-w-7xl w-full mx-auto px-4">
-        <div>&copy; 2026 SereneFlow Sanctuary. All original state, handlers, and backend logic preserved perfectly.</div>
+        <div>&copy; 2026 SereneFlow Sanctuary. All unified attributes configured.</div>
     </footer>
 
     <script>
         let activeTheme = 'dark';
         let activeView = 'landing';
         let activeAuthMode = 'login';
+        let isVisorOpen = false;
 
         const SUPABASE_URL = "{{ supabase_url }}";
         const SUPABASE_ANON_KEY = "{{ supabase_anon_key }}";
@@ -309,8 +324,81 @@
 
         if (SUPABASE_URL && SUPABASE_ANON_KEY) {
             supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        } else {
-            console.warn("Supabase configuration keys missing. Operating in standard UI Demo mode.");
+        }
+
+        // Initialize user values from local state
+        document.addEventListener("DOMContentLoaded", () => {
+            const hr = localStorage.getItem("user_heart_rate") || "72";
+            const sleep = localStorage.getItem("user_sleep_hours") || "7.5";
+            const stress = localStorage.getItem("user_stress_scale") || "4";
+
+            document.getElementById("hrInput").value = hr;
+            document.getElementById("hrVal").innerText = hr;
+            document.getElementById("sleepInput").value = sleep;
+            document.getElementById("sleepVal").innerText = sleep;
+            document.getElementById("stressInput").value = stress;
+            document.getElementById("stressVal").innerText = stress;
+        });
+
+        function toggleVisorPanel() {
+            const panel = document.getElementById("visorPanelContainer");
+            isVisorOpen = !isVisorOpen;
+            if (isVisorOpen) {
+                panel.classList.remove("translate-x-full");
+            } else {
+                panel.classList.add("translate-x-full");
+            }
+        }
+
+        function updateVitalMetric(type, value) {
+            document.getElementById(`${type}Val`).innerText = value;
+            if (type === 'hr') localStorage.setItem("user_heart_rate", value);
+            if (type === 'sleep') localStorage.setItem("user_sleep_hours", value);
+            if (type === 'stress') localStorage.setItem("user_stress_scale", value);
+        }
+
+        async function calculateStressPlan() {
+            const outNode = document.getElementById("analyticsOutputArea");
+            outNode.classList.remove("hidden");
+            outNode.innerText = "Formulating adaptive stress guide context...";
+
+            try {
+                const response = await fetch('/api/stress-plan', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        stress_scale: localStorage.getItem("user_stress_scale") || "4",
+                        sleep_hours: localStorage.getItem("user_sleep_hours") || "7.5",
+                        heart_rate: localStorage.getItem("user_heart_rate") || "72"
+                    })
+                });
+                const data = await response.json();
+                outNode.innerText = data.plan || "Error processing strategy.";
+            } catch {
+                outNode.innerText = "Failed to synchronize with AI core.";
+            }
+        }
+
+        async function calculateSleepAnalysis() {
+            const outNode = document.getElementById("analyticsOutputArea");
+            outNode.classList.remove("hidden");
+            outNode.innerText = "Analyzing sleep parameters structural metrics...";
+
+            try {
+                const response = await fetch('/api/sleep-analysis', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        hours: localStorage.getItem("user_sleep_hours") || "7.5",
+                        quality: 75,
+                        consistency: "variable"
+                    })
+                });
+                const data = await response.json();
+                outNode.innerText = data.analysis || "Error computing indices.";
+            } catch {
+                outNode.innerText = "Failed to communicate with AI core.";
+            }
         }
 
         function toggleTheme() {
@@ -343,7 +431,7 @@
             } else {
                 ctaBtn.innerText = 'Sign In';
                 ctaBtn.disabled = false;
-                ctaBtn.className = "px-5 h-11 text-sm font-medium rounded-xl bg-emerald-800 hover:bg-emerald-700 text-white dark:bg-emerald-700 dark:hover:bg-emerald-600 transition-all duration-200 shadow-md shadow-emerald-900/10";
+                ctaBtn.className = "px-5 h-11 text-sm font-medium rounded-xl bg-emerald-800 hover:bg-emerald-700 text-white dark:bg-emerald-700 dark:hover:bg-emerald-600 transition-all duration-200 shadow-md";
             }
         }
 
@@ -359,14 +447,14 @@
                 titleNode.innerText = 'Begin Journey';
                 subtitleNode.innerText = 'Create your unique username and password credentials';
                 submitBtnNode.innerText = 'Register & Enter';
-                registerTabBtn.className = "flex-1 py-2.5 text-sm font-medium rounded-lg bg-white dark:bg-emerald-800 text-stone-800 dark:text-white shadow-xs transition-all duration-150";
-                loginTabBtn.className = "flex-1 py-2.5 text-sm font-medium rounded-lg text-stone-500 dark:text-emerald-400/60 hover:text-stone-800 dark:hover:text-emerald-200 transition-all duration-150";
+                registerTabBtn.className = "flex-1 py-2.5 text-sm font-medium rounded-lg bg-white dark:bg-emerald-800 text-stone-800 dark:text-white shadow-xs";
+                loginTabBtn.className = "flex-1 py-2.5 text-sm font-medium rounded-lg text-stone-500 dark:text-emerald-400/60";
             } else {
                 titleNode.innerText = 'Welcome Back';
                 subtitleNode.innerText = 'Return to your private forest sanctuary';
                 submitBtnNode.innerText = 'Enter Sanctuary';
-                loginTabBtn.className = "flex-1 py-2.5 text-sm font-medium rounded-lg bg-white dark:bg-emerald-800 text-stone-800 dark:text-white shadow-xs transition-all duration-150";
-                registerTabBtn.className = "flex-1 py-2.5 text-sm font-medium rounded-lg text-stone-500 dark:text-emerald-400/60 hover:text-stone-800 dark:hover:text-emerald-200 transition-all duration-150";
+                loginTabBtn.className = "flex-1 py-2.5 text-sm font-medium rounded-lg bg-white dark:bg-emerald-800 text-stone-800 dark:text-white shadow-xs";
+                registerTabBtn.className = "flex-1 py-2.5 text-sm font-medium rounded-lg text-stone-500 dark:text-emerald-400/60";
             }
         }
 
@@ -376,7 +464,6 @@
             const passwordVal = document.getElementById('authPassword').value;
 
             if (!supabaseClient) {
-                console.log(`Demo verification handler fallback running: ${activeAuthMode} -> ${usernameVal}`);
                 navigateTo('app');
                 return;
             }
@@ -389,34 +476,23 @@
                     .maybeSingle();
 
                 if (existingUser) {
-                    alert("This user name is already taken. Please select a different identity.");
+                    alert("This username is already taken.");
                     return;
                 }
 
-                const { error: insertError } = await supabaseClient
-                    .from('user_credentials')
-                    .insert([{ username: usernameVal, password: passwordVal }]);
-
-                if (insertError) {
-                    alert(`Account creation error: ${insertError.message}`);
-                } else {
-                    alert("Account setup successfully complete!");
-                    navigateTo('app');
-                }
+                await supabaseClient.from('user_credentials').insert([{ username: usernameVal, password: passwordVal }]);
+                navigateTo('app');
             } else {
-                const { data: userRecord, error: fetchError } = await supabaseClient
+                const { data: userRecord } = await supabaseClient
                     .from('user_credentials')
                     .select('*')
                     .eq('username', usernameVal)
                     .eq('password', passwordVal)
                     .maybeSingle();
 
-                if (fetchError) {
-                    alert(`Authentication system error: ${fetchError.message}`);
-                } else if (!userRecord) {
-                    alert("Invalid Username or Password. Please confirm credentials or switch to Register tab.");
+                if (!userRecord) {
+                    alert("Invalid Username or Password.");
                 } else {
-                    console.log(`Authentication verified for username: ${userRecord.username}`);
                     navigateTo('app');
                 }
             }
@@ -424,24 +500,10 @@
 
         async function handleGoogleLogin() {
             if (!supabaseClient) {
-                alert("Supabase credentials missing. Mocking redirect behavior to app view.");
                 navigateTo('app');
                 return;
             }
-
-            const { error } = await supabaseClient.auth.signInWithOAuth({
-                provider: 'google',
-                options: {
-                    redirectTo: window.location.origin,
-                    queryParams: {
-                        prompt: 'select_account'
-                    }
-                }
-            });
-
-            if (error) {
-                alert(`Google Auth execution error: ${error.message}`);
-            }
+            await supabaseClient.auth.signInWithOAuth({ provider: 'google' });
         }
 
         function toggleAudioPlayback() {
@@ -455,25 +517,20 @@
             if (!isAudioPlaying) {
                 audioTrackEngine.play().then(() => {
                     isAudioPlaying = true;
-                    actionBtn.innerText = "Pause";
-                    actionBtn.className = "h-11 px-3 rounded-xl bg-amber-700 text-white font-medium text-xs hover:bg-amber-600 transition-all flex items-center justify-center min-w-[80px]";
-                }).catch(err => {
-                    console.error("Audio playback error caught:", err);
-                    alert("Click somewhere on the page first so the browser permits audio playback!");
+                    actionBtn.innerText = "Pause Audio";
+                }).catch(() => {
+                    alert("Click somewhere on the page first to allow playback!");
                 });
             } else {
                 audioTrackEngine.pause();
                 isAudioPlaying = false;
-                actionBtn.innerText = "Play";
-                actionBtn.className = "h-11 px-3 rounded-xl bg-emerald-800 text-white font-medium text-xs hover:bg-emerald-700 transition-all flex items-center justify-center min-w-[80px]";
+                actionBtn.innerText = "Play Audio";
             }
         }
 
         function handleAudioChange() {
             const selectElement = document.getElementById('audioVibeSelect');
-            const targetTrackUrl = ambientSoundTracks[selectElement.value];
-            
-            audioTrackEngine.src = targetTrackUrl;
+            audioTrackEngine.src = ambientSoundTracks[selectElement.value];
             if (isAudioPlaying) {
                 audioTrackEngine.play();
             }
@@ -486,84 +543,68 @@
             if (!messageText) return;
 
             const chatWindow = document.getElementById('chatMessageWindow');
-            const userMsgHtml = `
+            chatWindow.insertAdjacentHTML('beforeend', `
                 <div class="flex items-start space-x-3 max-w-[85%] ml-auto justify-end">
                     <div class="bg-emerald-700 text-white rounded-2xl rounded-tr-none p-3.5 text-sm shadow-xs">
                         ${messageText}
                     </div>
                 </div>
-            `;
-            chatWindow.insertAdjacentHTML('beforeend', userMsgHtml);
+            `);
             inputField.value = '';
             chatWindow.scrollTop = chatWindow.scrollHeight;
 
             const placeholderId = "typing-" + Date.now();
-            const typingPlaceholderHtml = `
+            chatWindow.insertAdjacentHTML('beforeend', `
                 <div id="${placeholderId}" class="flex items-start space-x-3 max-w-[85%] animate-pulse">
                     <div class="w-8 h-8 rounded-lg bg-emerald-800 text-white flex items-center justify-center text-xs shrink-0 font-serif">E</div>
                     <div class="bg-stone-200/40 dark:bg-emerald-950/20 rounded-2xl rounded-tl-none p-3.5 text-sm text-stone-500">
                         Elowen is listening...
                     </div>
                 </div>
-            `;
-            chatWindow.insertAdjacentHTML('beforeend', typingPlaceholderHtml);
+            `);
             chatWindow.scrollTop = chatWindow.scrollHeight;
 
             let companionResponseText = "";
 
             try {
-                const cachedHeartRate = localStorage.getItem("user_heart_rate") || "";
-                const cachedSleepHours = localStorage.getItem("user_sleep_hours") || "";
-                const cachedStressScale = localStorage.getItem("user_stress_scale") || "";
-
                 const response = await fetch('/api/chat', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ 
                         message: messageText, 
                         history: [],
-                        heart_rate: cachedHeartRate,
-                        sleep_hours: cachedSleepHours,
-                        stress_scale: cachedStressScale
+                        heart_rate: localStorage.getItem("user_heart_rate") || "72",
+                        sleep_hours: localStorage.getItem("user_sleep_hours") || "7.5",
+                        stress_scale: localStorage.getItem("user_stress_scale") || "4"
                     })
                 });
 
                 if (response.ok) {
                     const data = await response.json();
-                    companionResponseText = data.reply || data.response || data.analysis;
+                    companionResponseText = data.reply;
                 }
-            } catch (error) {
-                console.warn("Backend pipeline issue. Activating internal fallback array.");
-            }
+            } catch {}
 
             if (!companionResponseText) {
-                const bestFriendEmulations = [
-                    "I hear you completely, and honestly, that sounds like a massive amount to carry by yourself. Take a long, deep breath. I'm right here with you. What do you think you need most in this exact moment?",
-                    "Oof, I totally get why that would make you feel down. It is completely valid to feel scattered or overwhelmed by that. Let's just sit with it for a second. Tell me everything, I'm listening.",
-                    "That makes so much sense. You have been pushing yourself so hard lately, remember to give yourself a break. Do you want to keep venting about it, or should we talk about something to take your mind off things?",
-                    "I'm really glad you trusted me enough to say that out loud. Real friends stick around through the heavy thoughts, and I'm right here. What is one small thing we can focus on together right now to clear the air?"
-                ];
-                companionResponseText = bestFriendEmulations[Math.floor(Math.random() * bestFriendEmulations.length)];
+                companionResponseText = "I hear you completely. Take a long, deep breath. I'm right here with you.";
             }
 
             const placeholderNode = document.getElementById(placeholderId);
             if (placeholderNode) placeholderNode.remove();
 
-            const companionMsgHtml = `
+            chatWindow.insertAdjacentHTML('beforeend', `
                 <div class="flex items-start space-x-3 max-w-[85%]">
                     <div class="w-8 h-8 rounded-lg bg-emerald-800 text-white flex items-center justify-center text-xs shrink-0 font-serif">E</div>
                     <div class="bg-stone-200/60 dark:bg-emerald-950/30 border border-stone-300/20 dark:border-emerald-900/20 rounded-2xl rounded-tl-none p-3.5 text-sm text-stone-700 dark:text-emerald-100">
                         ${companionResponseText}
                     </div>
                 </div>
-            `;
-            chatWindow.insertAdjacentHTML('beforeend', companionMsgHtml);
+            `);
             chatWindow.scrollTop = chatWindow.scrollHeight;
         }
 
         function clearChatLog() {
-            const chatWindow = document.getElementById('chatMessageWindow');
-            chatWindow.innerHTML = `
+            document.getElementById('chatMessageWindow').innerHTML = `
                 <div class="flex items-start space-x-3 max-w-[85%]">
                     <div class="w-8 h-8 rounded-lg bg-emerald-800 text-white flex items-center justify-center text-xs shrink-0 font-serif">E</div>
                     <div class="bg-stone-200/60 dark:bg-emerald-950/30 border border-stone-300/20 dark:border-emerald-900/20 rounded-2xl rounded-tl-none p-3.5 text-sm text-stone-700 dark:text-emerald-100">
@@ -575,10 +616,7 @@
 
         if (supabaseClient) {
             supabaseClient.auth.onAuthStateChange((event, session) => {
-                if (session) {
-                    console.log(`Persistent session detected (${event}). Forwarding user into sanctuary.`);
-                    navigateTo('app');
-                }
+                if (session) navigateTo('app');
             });
         }
     </script>
