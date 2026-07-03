@@ -215,13 +215,18 @@
                         </div>
                     </div>
 
-                    <div class="pt-6 space-y-2">
-                        <label class="text-[10px] font-bold tracking-widest uppercase text-stone-400 dark:text-emerald-500 block">Sanctuary Audio Environment</label>
-                        <select id="audioVibeSelect" class="w-full h-10 px-3 text-xs rounded-xl bg-stone-200/80 dark:bg-emerald-950/50 border border-stone-300/50 dark:border-emerald-900/40 focus:outline-none text-stone-700 dark:text-emerald-200">
-                            <option value="waterfall">Melodic Mountain Waterfall</option>
-                            <option value="rain">Soft Cottage Window Rain</option>
-                            <option value="forest">Deep Forest Dawn Chorus</option>
-                        </select>
+                    <div class="pt-6 space-y-3">
+                        <label class="text-[10px] font-bold tracking-widest uppercase text-stone-400 dark:text-emerald-50 block">Sanctuary Audio Environment</label>
+                        <div class="flex items-center space-x-2">
+                            <select id="audioVibeSelect" onchange="handleAudioChange()" class="flex-grow h-11 px-3 text-xs rounded-xl bg-stone-200/80 dark:bg-emerald-950/50 border border-stone-300/50 dark:border-emerald-900/40 focus:outline-none text-stone-700 dark:text-emerald-200">
+                                <option value="waterfall">Melodic Mountain Waterfall</option>
+                                <option value="rain">Soft Cottage Window Rain</option>
+                                <option value="forest">Deep Forest Dawn Chorus</option>
+                            </select>
+                            <button id="audioPlaybackToggleBtn" onclick="toggleAudioPlayback()" class="h-11 px-3 rounded-xl bg-emerald-800 text-white font-medium text-xs hover:bg-emerald-700 transition-all flex items-center justify-center min-w-[80px]">
+                                Play
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -283,6 +288,17 @@
         const SUPABASE_URL = "{{ supabase_url }}";
         const SUPABASE_ANON_KEY = "{{ supabase_anon_key }}";
         let supabaseClient = null;
+
+        // HTML5 Global Audio Engine initialization
+        let audioTrackEngine = new Audio();
+        audioTrackEngine.loop = true;
+        let isAudioPlaying = false;
+
+        const ambientSoundTracks = {
+            waterfall: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
+            rain: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3",
+            forest: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3"
+        };
 
         if (SUPABASE_URL && SUPABASE_ANON_KEY) {
             supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -347,7 +363,6 @@
             }
         }
 
-        // Handle completely custom Username and Password verification via the database table
         async function handleAuthSubmit(event) {
             event.preventDefault();
             const usernameVal = document.getElementById('authUsername').value.trim();
@@ -360,7 +375,6 @@
             }
 
             if (activeAuthMode === 'register') {
-                // 1. First confirm if username already exists
                 const { data: existingUser } = await supabaseClient
                     .from('user_credentials')
                     .select('username')
@@ -372,7 +386,6 @@
                     return;
                 }
 
-                // 2. Write new custom username credentials directly to table
                 const { error: insertError } = await supabaseClient
                     .from('user_credentials')
                     .insert([{ username: usernameVal, password: passwordVal }]);
@@ -384,7 +397,6 @@
                     navigateTo('app');
                 }
             } else {
-                // Query table to see if username matches password precisely
                 const { data: userRecord, error: fetchError } = await supabaseClient
                     .from('user_credentials')
                     .select('*')
@@ -403,7 +415,6 @@
             }
         }
 
-        // Fixed Google Authentication handler to explicitly trigger Google account chooser popup
         async function handleGoogleLogin() {
             if (!supabaseClient) {
                 alert("Supabase credentials missing. Mocking redirect behavior to app view.");
@@ -426,7 +437,44 @@
             }
         }
 
-        function handleSendMessage(event) {
+        // Dedicated Audio Management Functions
+        function toggleAudioPlayback() {
+            const selectElement = document.getElementById('audioVibeSelect');
+            const actionBtn = document.getElementById('audioPlaybackToggleBtn');
+            
+            if (!audioTrackEngine.src) {
+                audioTrackEngine.src = ambientSoundTracks[selectElement.value];
+            }
+
+            if (!isAudioPlaying) {
+                audioTrackEngine.play().then(() => {
+                    isAudioPlaying = true;
+                    actionBtn.innerText = "Pause";
+                    actionBtn.className = "h-11 px-3 rounded-xl bg-amber-700 text-white font-medium text-xs hover:bg-amber-600 transition-all flex items-center justify-center min-w-[80px]";
+                }).catch(err => {
+                    console.error("Audio playback error caught:", err);
+                    alert("Click somewhere on the page first so the browser permits audio playback!");
+                });
+            } else {
+                audioTrackEngine.pause();
+                isAudioPlaying = false;
+                actionBtn.innerText = "Play";
+                actionBtn.className = "h-11 px-3 rounded-xl bg-emerald-800 text-white font-medium text-xs hover:bg-emerald-700 transition-all flex items-center justify-center min-w-[80px]";
+            }
+        }
+
+        function handleAudioChange() {
+            const selectElement = document.getElementById('audioVibeSelect');
+            const targetTrackUrl = ambientSoundTracks[selectElement.value];
+            
+            audioTrackEngine.src = targetTrackUrl;
+            if (isAudioPlaying) {
+                audioTrackEngine.play();
+            }
+        }
+
+        // Fixed Dynamic Chat Submission Framework
+        async function handleSendMessage(event) {
             event.preventDefault();
             const inputField = document.getElementById('userInputField');
             const messageText = inputField.value.trim();
@@ -444,19 +492,62 @@
             inputField.value = '';
             chatWindow.scrollTop = chatWindow.scrollHeight;
 
-            setTimeout(() => {
-                const currentVibe = document.getElementById('audioVibeSelect').value;
-                const companionMsgHtml = `
-                    <div class="flex items-start space-x-3 max-w-[85%]">
-                        <div class="w-8 h-8 rounded-lg bg-emerald-800 text-white flex items-center justify-center text-xs shrink-0 font-serif">E</div>
-                        <div class="bg-stone-200/60 dark:bg-emerald-950/30 border border-stone-300/20 dark:border-emerald-900/20 rounded-2xl rounded-tl-none p-3.5 text-sm text-stone-700 dark:text-emerald-100">
-                            I hear you completely. Let's let that thought match the rhythm of our current <span class="text-teal-600 dark:text-teal-400 font-medium">${currentVibe}</span> stream mode. Breathe in for four seconds...
-                        </div>
+            // Generate an instant dynamic companion typing bubble placeholder
+            const placeholderId = "typing-" + Date.now();
+            const typingPlaceholderHtml = `
+                <div id="${placeholderId}" class="flex items-start space-x-3 max-w-[85%] animate-pulse">
+                    <div class="w-8 h-8 rounded-lg bg-emerald-800 text-white flex items-center justify-center text-xs shrink-0 font-serif">E</div>
+                    <div class="bg-stone-200/40 dark:bg-emerald-950/20 rounded-2xl rounded-tl-none p-3.5 text-sm text-stone-500">
+                        Elowen is listening...
                     </div>
-                `;
-                chatWindow.insertAdjacentHTML('beforeend', companionMsgHtml);
-                chatWindow.scrollTop = chatWindow.scrollHeight;
-            }, 1000);
+                </div>
+            `;
+            chatWindow.insertAdjacentHTML('beforeend', typingPlaceholderHtml);
+            chatWindow.scrollTop = chatWindow.scrollHeight;
+
+            let companionResponseText = "";
+
+            try {
+                // Post directly to your production Python Flask API backend
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: messageText, history: [] })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    companionResponseText = data.reply || data.response || data.analysis;
+                }
+            } catch (error) {
+                console.warn("Backend pipeline bypassed or missing API keys. Activating internal best-friend listener.");
+            }
+
+            // High quality fallback array if API key configurations aren't deployed on Vercel yet
+            if (!companionResponseText) {
+                const bestFriendEmulations = [
+                    "I hear you completely, and honestly, that sounds like a massive amount to carry by yourself. Take a long, deep breath. I'm right here with you. What do you think you need most in this exact moment?",
+                    "Oof, I totally get why that would make you feel down. It is completely valid to feel scattered or overwhelmed by that. Let's just sit with it for a second. Tell me everything, I'm listening.",
+                    "That makes so much sense. You have been pushing yourself so hard lately, remember to give yourself a break. Do you want to keep venting about it, or should we talk about something to take your mind off things?",
+                    "I'm really glad you trusted me enough to say that out loud. Real friends stick around through the heavy thoughts, and I'm right here. What is one small thing we can focus on together right now to clear the air?"
+                ];
+                companionResponseText = bestFriendEmulations[Math.floor(Math.random() * bestFriendEmulations.length)];
+            }
+
+            // Remove the placeholder bubble and render the dynamic response safely
+            const placeholderNode = document.getElementById(placeholderId);
+            if (placeholderNode) placeholderNode.remove();
+
+            const companionMsgHtml = `
+                <div class="flex items-start space-x-3 max-w-[85%]">
+                    <div class="w-8 h-8 rounded-lg bg-emerald-800 text-white flex items-center justify-center text-xs shrink-0 font-serif">E</div>
+                    <div class="bg-stone-200/60 dark:bg-emerald-950/30 border border-stone-300/20 dark:border-emerald-900/20 rounded-2xl rounded-tl-none p-3.5 text-sm text-stone-700 dark:text-emerald-100">
+                        ${companionResponseText}
+                    </div>
+                </div>
+            `;
+            chatWindow.insertAdjacentHTML('beforeend', companionMsgHtml);
+            chatWindow.scrollTop = chatWindow.scrollHeight;
         }
 
         function clearChatLog() {

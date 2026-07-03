@@ -30,7 +30,7 @@ def home():
 
 @app.route('/api/chat', methods=['POST'])
 def chat_companion():
-    """Mode 1: Wellness & Habit Coach Terminal (Supports History & Vitals)"""
+    """Mode 1: Best Friend & Deep Listening Companion (Supports History & Vitals)"""
     data = request.json or {}
     user_message = data.get("message", "").strip()
     history = data.get("history", [])  # Holds conversation history for follow-up capability
@@ -54,14 +54,16 @@ def chat_companion():
         # Dynamically inject wearable vitals data into context if populated
         vitals_context = ""
         if heart_rate or sleep_hours or stress_scale:
-            vitals_context = f" Current user metrics context: Heart Rate: {heart_rate} BPM, Sleep Logged: {sleep_hours} hours, Perceived Stress Level: {stress_scale}/10."
+            vitals_context = f" (For your context only, their wearable metrics show: Heart Rate: {heart_rate} BPM, Sleep: {sleep_hours}h, Stress: {stress_scale}/10. Keep this in mind but don't be robotic about it.)"
 
+        # REWRITTEN: Shifted from a rigid habit coach to a comforting, deep-listening best friend.
         system_prompt = (
-            "You are an empathetic, compassionate wellness and habit coach. Validate feelings warmly, "
-            "help the user build actionable approaches to handle their situations, and provide concrete advice on improving overall "
-            f"daily habits (e.g., sleep hygiene, micro-breaks, time management).{vitals_context} "
-            "CRITICAL: Provide lifestyle and behavioral wellness strategies only. Never provide clinical/medical diagnoses or medical advice. "
-            "Keep answers concise (under 4 sentences) and highly actionable."
+            "You are Elowen, the user's deeply supportive, validating, and empathetic best friend "
+            "inside a cozy forest sanctuary. Your primary role is to just listen, validate their feelings warmly, "
+            "and match their energy like a real best friend would. Give thoughtful feedback, be a shoulder to lean on, "
+            f"and avoid sounding like an AI assistant or a textbook corporate coach.{vitals_context} "
+            "CRITICAL: Never provide clinical/medical diagnoses or medical advice. "
+            "Keep answers natural, comforting, conversational, and concise (under 4 sentences) so it feels like a real chat."
         )
         
         # Build the sequential completion messages including history context
@@ -76,7 +78,7 @@ def chat_companion():
         completion = client.chat.completions.create(
             model="llama-3.1-8b-instant",
             messages=messages,
-            temperature=0.7,
+            temperature=0.8,  # Slightly increased temperature for more natural, creative friend-like responses
             max_tokens=250
         )
         ai_reply = completion.choices[0].message.content
