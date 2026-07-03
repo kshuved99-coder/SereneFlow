@@ -63,7 +63,7 @@ def chat_companion():
             "Give thoughtful feedback, but dont seem pushy "
             f"and avoid sounding like an AI assistant or a textbook corporate coach. or being pushy "
             "CRITICAL: Never provide clinical/medical diagnoses or medical advice. "
-            "Keep answers natural, comforting, conversational, and concise (under 3 sentences) so it feels like a real chat.don't keep conversations long too long ask if they want to keep chatting."
+            "Keep answers natural, comforting, conversational, and concise (under 3 sentences) so it feels like a real chat.don't keep conversations long too long ask them do you want to keep chatting."
         )
         
         # Build the sequential completion messages including history context
