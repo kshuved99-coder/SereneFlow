@@ -1,8 +1,3 @@
-Here is the complete, fully refactored, and operational `index.py` script.
-
-It includes the **critical bug fix** (injecting `vitals_context` into the system prompt structure) and implements the **crisis safety intercept guardrail** to immediately protect users and mitigate legal/safety liabilities before triggering an LLM generation loop.
-
-```python
 import os
 from flask import Flask, render_template, request, jsonify
 from groq import Groq
@@ -33,6 +28,15 @@ def home():
         supabase_anon_key=os.environ.get("SUPABASE_ANON_KEY", "")
     )
 
+@app.route('/vitals')
+def vitals_page():
+    """NEW ROUTE: Serves the separate standalone health parameter entry interface."""
+    return render_template(
+        'vitals.html',
+        supabase_url=os.environ.get("SUPABASE_URL", ""),
+        supabase_anon_key=os.environ.get("SUPABASE_ANON_KEY", "")
+    )
+
 @app.route('/api/chat', methods=['POST'])
 def chat_companion():
     """Mode 1: Best Friend & Deep Listening Companion (Supports History & Vitals)"""
@@ -48,14 +52,6 @@ def chat_companion():
 
     safety_triggered = any(keyword in user_message.lower() for keyword in CRISIS_KEYWORDS)
 
-    # CRITICAL SECURITY INTERCEPT: Stop execution and provide immediate, hardcoded assistance
-    # if a crisis word matches, avoiding unreliable or delayed AI generation.
-    if safety_triggered:
-        return jsonify({
-            "reply": "I hear how much pain you're in, but I am an AI companion and cannot provide the professional crisis support you deserve. Please connect with someone who can help right now: Call or text 988 (in the US) to reach the Suicide & Crisis Lifeline. You don't have to carry this alone.",
-            "safety_triggered": True
-        })
-
     client = get_groq_client()
     if not client:
         return jsonify({
@@ -67,18 +63,17 @@ def chat_companion():
         # Dynamically inject wearable vitals data into context if populated
         vitals_context = ""
         if heart_rate or sleep_hours or stress_scale:
-            vitals_context = f" For your context only, their wearable metrics show: Heart Rate: {heart_rate} BPM, Sleep: {sleep_hours}h, Stress: {stress_scale}/10. Keep this in mind but don't be robotic about it. "
+            vitals_context = f" (For your context only, their wearable metrics show: Heart Rate: {heart_rate} BPM, Sleep: {sleep_hours}h, Stress: {stress_scale}/10. Keep this in mind but don't be robotic about it.)"
 
-        # FIXED: Injected the '{vitals_context}' string variable directly into the f-string prompt setup
+        # REWRITTEN: Shifted from a rigid habit coach to a comforting, deep-listening best friend.
         system_prompt = (
-            "You are Elowen, the user's deeply supportive, validating, and empathetic companion. "
+            "You are Elowen, the user's deeply supportive, validating, and empathetic companion "
             "Your primary role is to just listen, validate their feelings warmly, "
-            "give thoughtful feedback, but don't seem pushy, "
-            "and avoid sounding like an AI assistant or a textbook corporate coach. "
-            f"{vitals_context}"
+            "Give thoughtful feedback, but dont seem pushy "
+            f"and avoid sounding like an AI assistant or a textbook corporate coach. or being pushy "
+            f"{vitals_context} "
             "CRITICAL: Never provide clinical/medical diagnoses or medical advice. "
-            "Keep answers natural, comforting, conversational, and concise (under 3 sentences) so it feels like a real chat. "
-            "Don't keep conversations going too long; ask them if they want to keep chatting."
+            "Keep answers natural, comforting, conversational, and concise (under 3 sentences) so it feels like a real chat.don't keep conversations long too long ask them do you want to keep chatting."
         )
         
         # Build the sequential completion messages including history context
@@ -170,9 +165,7 @@ def sleep_analyser():
         )
         return jsonify({"analysis": completion.choices[0].message.content})
     except Exception as e:
-        return jsonify({"analysis": f"Sleep metrics analytics processing error: {str(e)}"}), 500
+        return jsonify({"analysis": f"Sleep metrics analytics processing error: {str(e)}\"}), 500
 
 if __name__ == '__main__':
     app.run(debug=True)
-
-```
